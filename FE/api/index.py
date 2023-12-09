@@ -30,9 +30,6 @@ def run_final_script():
         # os.chdir("C:/Users/vuxxw/PycharmProjects/ExtractID/Extract_ID_Card/BE")
         # os.chdir("../../BE")
         subprocess.run(["python3", "final.py"])
-        shutil.rmtree("chars")
-        shutil.rmtree("images")
-        shutil.rmtree("info")
         return {"message": "final.py executed successfully"}
     except Exception as e:
         return {"error": f"Error executing final.py: {str(e)}"}
