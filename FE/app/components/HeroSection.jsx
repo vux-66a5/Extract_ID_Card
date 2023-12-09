@@ -34,7 +34,7 @@ const HeroSection = () => {
       }
     }
   };
-
+  const fileInputRef = useRef(null);
 
   return (
     <section>
@@ -65,13 +65,24 @@ const HeroSection = () => {
 
           <p className="text-[#ADB7BE] text-base sm:text-xl mb-6 lg:text-1xl">
             Hướng dẫn sử dụng: &nbsp;
-            <Link href="/howtouse.txt">
+            <Link href="/instruction.html">
               <code className=" font-bold">Tại đây</code>
             </Link>
           </p>
 
           <div>
-            <input type="file" onChange={handleFileChange}/>
+            {/*<input type="file" onChange={handleFileChange}/>*/}
+                <div className="custom-file-input">
+              <input type="file" id="fileInput" className="hidden" onChange={handleFileChange} />
+            <label htmlFor="fileInput" id="fileInputLabel">
+              <span>Choose File</span>
+            </label>
+            {file && (
+              <div htmlFor="fileInput" id="fileInputLabel" style={{ color: 'black', marginLeft:"8px" }}>
+                {file.name}
+              </div>
+            )}
+                </div>
             <div className='mt-3'></div>
 
             <button
@@ -80,13 +91,13 @@ const HeroSection = () => {
             >
               Xác nhận ảnh
             </button>
-            {/*<input*/}
-            {/*  type="file"*/}
-            {/*  accept="image/*"*/}
-            {/*  onChange={handleFileChange}*/}
-            {/*  ref={fileInputRef}*/}
-            {/*  style={{ display: 'none' }}*/}
-            {/*/>*/}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+            />
 
  {uploadSuccess && (
           <button className="px-1 py-1 w-full sm:w-fit rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 hover:bg-slate-800 text-white mt-3">
@@ -111,6 +122,33 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
+        <style jsx>{`
+        .custom-file-input {
+          display: flex;
+          align-items: center;
+        }
+
+        .hidden {
+          display: none;
+        }
+
+        #fileInputLabel {
+          background: #fff;
+          color: #000;
+          border: 1px solid #000;
+          padding: 8px 12px;
+          border-radius: 5px;
+          cursor: pointer;
+          user-select: none;
+        }
+
+        #fileInputLabel span {
+          display: inline-block;
+          margin-right: 8px;
+        }
+
+        /* Add any other styles here */
+      `}</style>
     </section >
   );
 };
