@@ -13,13 +13,23 @@ def read_edge_img(original_img_path):
     return edge_img
 
 def find_lines(edge_image):
+    # Define the initial threshold value
+    threshold_value = 350
 
-    # Apply Canny edge detection
-    edges = cv2.Canny(edge_image, 50, 150, apertureSize=3)
+    # Iterate until you find exactly 4 lines
+    while True:
 
-    # Use Hough Line Transform to find lines
-    lines = cv2.HoughLines(edges, 2, np.pi / 180, threshold=400)
+        edges = cv2.Canny(edge_image, 50, 150, apertureSize=3)
 
+        # Sử dụng Hough Line Transform để tìm các đường thẳng
+        lines = cv2.HoughLines(edges, 2, np.pi / 180, threshold=threshold_value)
+
+        # Check if the number of lines is exactly 4
+        if lines is not None and len(lines) == 4:
+            break
+        else:
+            # Increment the threshold for the next iteration
+            threshold_value += 1
     return lines
 def get_corners_coordinates(edge_img):
 
