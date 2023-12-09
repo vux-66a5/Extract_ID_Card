@@ -65,7 +65,7 @@ def merge_overlapping_boxes(boxes):
 
 def remove_background_for_folder(folder_path):
     # Initialize RemoveBg with your API key
-    rmbg = RemoveBg("4zYXv9jCJeQbMuzu3ckuxQFZ", "error.log")
+    rmbg = RemoveBg("he1V59AqpPt6ypJXqSW1FXRi", "error.log")
 
     files = os.listdir(folder_path)
 
