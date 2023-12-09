@@ -318,8 +318,8 @@ def big_process():
     line_path = "info"
     char_path = "chars"
 
-    csv_file_path = "/Users/hoaithuong/Desktop/code/Extract_ID_Card_NonAI/output.csv"
-    with open(csv_file_path, mode='w', newline='', encoding='utf-8') as csv_file:
+    csv_file_path = "output.csv"
+    with open(csv_file_path, mode='a', newline='', encoding='utf-8') as csv_file:
         csv_writer = csv.writer(csv_file)
 
         for page in os.listdir(page_path):

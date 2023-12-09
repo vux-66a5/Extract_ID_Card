@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.responses import FileResponse
@@ -22,19 +24,40 @@ app.add_middleware(
 app.mount("/public", StaticFiles(directory="public"), name="public")
 
 
+def run_final_script():
+    try:
+        # os.chdir("C:/Users/vuxxw/PycharmProjects/ExtractID/Extract_ID_Card/BE")
+        # os.chdir("../../BE")
+        subprocess.run(["py", "final.py"])
+        return {"message": "final.py executed successfully"}
+    except Exception as e:
+        return {"error": f"Error executing final.py: {str(e)}"}
+
+
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...)):
+    current_directory = Path.cwd()
+    be_directory = current_directory.parent / "BE"
+    os.chdir(be_directory)
     try:
-        with open(f"../../BE/images/{file.filename}", "wb") as buffer:
+
+        with open(f"images/{file.filename}", "wb") as buffer:
             buffer.write(file.file.read())
-        subprocess.run(["python", "../../BE/final.py"])
+
+        # Execute final.py after successful file upload
+        run_final_script()
+
         return JSONResponse(content={"message": "File uploaded successfully"}, status_code=200)
     except Exception as e:
         return JSONResponse(content={"message": f"Error uploading file: {str(e)}"}, status_code=500)
 
+
 @app.get("/api/download")
 def download_output():
-    output_path = Path("../../BE/output.csv")
+    current_directory = Path.cwd()
+    be_directory = current_directory.parent / "BE"
+    os.chdir(be_directory)
+    output_path = Path("output.csv")
 
     if not output_path.is_file():
         return {"error": "File not found"}

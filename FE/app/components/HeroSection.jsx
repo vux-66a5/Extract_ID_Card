@@ -4,12 +4,13 @@ import Image from 'next/image';
 import { TypeAnimation } from 'react-type-animation';
 import Link from 'next/link';
 
-
 const HeroSection = () => {
-  
   const [file, setFile] = useState(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
+    setUploadSuccess(false); // Reset upload success state when a new file is selected
   };
 
   const handleUpload = async () => {
@@ -21,21 +22,20 @@ const HeroSection = () => {
         const response = await fetch('http://127.0.0.1:8000/uploadfile/', {
           method: 'POST',
           body: formData,
-          
         });
 
         const data = await response.json();
         console.log(data);
-        alert('Đã tải ảnh lên thành công');
+        setUploadSuccess(true); // Set upload success state to true
+        alert('Tách thông tin thành công, vui lòng tải xuống');
       } catch (error) {
         console.error('Error uploading file:', error);
+        setUploadSuccess(false); // Set upload success state to false in case of an error
       }
     }
-    
   };
-  
-  const fileInputRef = useRef(null);
-  
+
+
   return (
     <section>
       <div className="grid grid-cols-7 sm:grid-cols-12 ">
@@ -71,30 +71,30 @@ const HeroSection = () => {
           </p>
 
           <div>
-            <input type="file" onChange={handleFileChange} />
+            <input type="file" onChange={handleFileChange}/>
             <div className='mt-3'></div>
-            
+
             <button
               onClick={handleUpload}
               className="px-6 py-3 w-full sm:w-fit rounded-full mr-4 bg-gradient-to-br from-blue-500 to-pink-500 hover:bg-slate-200 text-white"
             >
               Xác nhận ảnh
             </button>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              ref={fileInputRef}
-              style={{ display: 'none' }}
-            />
+            {/*<input*/}
+            {/*  type="file"*/}
+            {/*  accept="image/*"*/}
+            {/*  onChange={handleFileChange}*/}
+            {/*  ref={fileInputRef}*/}
+            {/*  style={{ display: 'none' }}*/}
+            {/*/>*/}
 
-<button
-  className="px-1 py-1 w-full sm:w-fit rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 hover:bg-slate-800 text-white mt-3"
->
-  <a href="http://127.0.0.1:8000/api/download" className="block bg-gradient-to-br from-blue-500 to-pink-500 hover:bg-slate-800 rounded-full px-5 py-2">
-    Tải xuống
-  </a>
-</button>
+ {uploadSuccess && (
+          <button className="px-1 py-1 w-full sm:w-fit rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 hover:bg-slate-800 text-white mt-3">
+            <a href="http://127.0.0.1:8000/api/download" className="block bg-gradient-to-br from-blue-500 to-pink-500 hover:bg-slate-800 rounded-full px-5 py-2">
+              Tải xuống
+            </a>
+          </button>
+        )}
 
         </div>
 
