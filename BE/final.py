@@ -8,7 +8,7 @@ from change_img_perspective import wrap_perspective
 from extract_info import extract_info_to_imgs
 import unicodedata
 import csv
-
+from rembg import remove
 
 def load_image(input_path, scale_factor=6):
     image = Image.open(input_path).convert('L')
@@ -63,29 +63,36 @@ def merge_overlapping_boxes(boxes):
     return merged_boxes
 
 
+# def remove_background_for_folder(folder_path):
+#     # Initialize RemoveBg with your API key
+#     rmbg = RemoveBg("he1V59AqpPt6ypJXqSW1FXRi", "error.log")
+#
+#     files = os.listdir(folder_path)
+#
+#     for file in files:
+#         if file.lower().endswith('.png'):
+#             img_file_path = os.path.join(folder_path, file)
+#             # rmbg.remove_background_from_img_file(img_file_path=img_file_path, bg_color="black")
+#             rmbg.remove_background_from_img_file(img_file_path=img_file_path)
+#     move_no_bg(folder_path)
+#
+#
+# def move_no_bg(folder_path):
+#     files = os.listdir(folder_path)
+#     os.makedirs(f'{folder_path}/no_bg', exist_ok=True)
+#     for file in files:
+#         if file.endswith("_no_bg.png"):
+#             shutil.move(f"{folder_path}/{file}", f"{folder_path}/no_bg/{file}")
 def remove_background_for_folder(folder_path):
-    # Initialize RemoveBg with your API key
-    rmbg = RemoveBg("he1V59AqpPt6ypJXqSW1FXRi", "error.log")
-
+    os.makedirs(f'{folder_path}/no_bg', exist_ok=True)
     files = os.listdir(folder_path)
-
     for file in files:
         if file.lower().endswith('.png'):
             img_file_path = os.path.join(folder_path, file)
-            # rmbg.remove_background_from_img_file(img_file_path=img_file_path, bg_color="black")
-            rmbg.remove_background_from_img_file(img_file_path=img_file_path)
-    move_no_bg(folder_path)
-
-
-def move_no_bg(folder_path):
-    files = os.listdir(folder_path)
-    os.makedirs(f'{folder_path}/no_bg', exist_ok=True)
-    for file in files:
-        if file.endswith("_no_bg.png"):
-            shutil.move(f"{folder_path}/{file}", f"{folder_path}/no_bg/{file}")
-
-
-
+            output_file_path = os.path.join(f"{folder_path}/no_bg", f"{os.path.basename(img_file_path)}_no_bg.png")
+            img = Image.open(img_file_path)
+            img_no_bg = remove(img)
+            img_no_bg.save(output_file_path)
 
 def preprocess_cards(input_path):
     no_bg_path = os.path.join(input_path, 'no_bg')
@@ -295,26 +302,29 @@ def get_name(name):
             return ','
 
 
-def resize_all(input_path):
-    files = os.listdir(input_path)
-    for file in files:
-        original_path = f"{input_path}/{file}"
-        no_bg_path = f"{input_path}/no_bg/{file}_no_bg.png"
-
-        if os.path.exists(original_path) and os.path.exists(no_bg_path):
-            image_original = Image.open(original_path)
-            image_no_bg = Image.open(no_bg_path)
-            image_1 = image_no_bg.resize((image_original.width, image_original.height))
-            image_1.save(no_bg_path)
+# def resize_all(input_path):
+#     files = os.listdir(input_path)
+#     for file in files:
+#         original_path = f"{input_path}/{file}"
+#         no_bg_path = f"{input_path}/no_bg/{file}_no_bg.png"
+#
+#         if os.path.exists(original_path) and os.path.exists(no_bg_path):
+#             image_original = Image.open(original_path)
+#             image_no_bg = Image.open(no_bg_path)
+#             image_1 = image_no_bg.resize((image_original.width, image_original.height))
+#             image_1.save(no_bg_path)
 
 
 
 def big_process():
+
+    #Check if exist images/img_x.png before test this file
+
     start = time.time()
-    remove_background_for_folder("../images")
-    resize_all("../images")
-    preprocess_cards("../images")
-    page_path = "../images/warped"
+    remove_background_for_folder("images")
+    # resize_all("images")
+    preprocess_cards("images")
+    page_path = "images/warped"
     line_path = "info"
     char_path = "chars"
 
@@ -351,7 +361,14 @@ def big_process():
                     continue
 
                 elif line == "5.nation.png":
-                    id_card_data['nation'] = "Việt Nam"
+                    line_img_path = f"{line_path}/{line}"
+                    line_image = load_image(line_img_path)
+                    line_binary_image = preprocess_image(line_image, threshold)
+                    boxes = char_and_space_boxes(line_image, line_binary_image)
+                    if len(boxes) == 8:
+                        id_card_data['nation'] = "Việt Nam"
+                    else:
+                        id_card_data['nation'] = "Ngoại quốc"
                     continue
 
                 elif line == "1.id.png" or line == "3.dob.png":
@@ -441,5 +458,8 @@ def big_process():
             csv_writer.writerow([id_card_data[key] for key in id_card_data])
     end = time.time()
     print(end - start)
+    shutil.rmtree("chars")
+    shutil.rmtree("images")
+    shutil.rmtree("info")
 
 big_process()
