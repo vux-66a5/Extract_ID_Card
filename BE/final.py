@@ -311,10 +311,10 @@ def resize_all(input_path):
 
 def big_process():
     start = time.time()
-    remove_background_for_folder("images")
-    resize_all("images")
-    preprocess_cards("images")
-    page_path = "images/warped"
+    remove_background_for_folder("../images")
+    resize_all("../images")
+    preprocess_cards("../images")
+    page_path = "../images/warped"
     line_path = "info"
     char_path = "chars"
 

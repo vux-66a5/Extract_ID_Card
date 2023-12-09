@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
@@ -28,7 +29,10 @@ def run_final_script():
     try:
         # os.chdir("C:/Users/vuxxw/PycharmProjects/ExtractID/Extract_ID_Card/BE")
         # os.chdir("../../BE")
-        subprocess.run(["py", "final.py"])
+        subprocess.run(["python3", "final.py"])
+        shutil.rmtree("chars")
+        shutil.rmtree("images")
+        shutil.rmtree("info")
         return {"message": "final.py executed successfully"}
     except Exception as e:
         return {"error": f"Error executing final.py: {str(e)}"}
@@ -40,7 +44,7 @@ async def create_upload_file(file: UploadFile = File(...)):
     be_directory = current_directory.parent / "BE"
     os.chdir(be_directory)
     try:
-
+        os.makedirs("images", exist_ok=True)
         with open(f"images/{file.filename}", "wb") as buffer:
             buffer.write(file.file.read())
 
